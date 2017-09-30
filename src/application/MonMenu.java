@@ -3,6 +3,7 @@ package application;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.Optional;
 
 import javax.imageio.ImageIO;
 
@@ -11,12 +12,19 @@ import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.Image;
+import javafx.scene.input.ContextMenuEvent;
+import javafx.scene.input.KeyCharacterCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -61,6 +69,25 @@ public class MonMenu extends MenuBar {
 		stackpane = sp;
 		
 		this.getMenus().addAll(createMenuFile(), createMenuEdition());
+		
+		// Create ContextMenu
+		ContextMenu contextMenu = new ContextMenu();
+
+		final MenuItem menuEditionZoomUp = new MenuItem("Zoom +0.5");
+		menuEditionZoomUp.setOnAction(editionZoomUpHandler());
+		final MenuItem menuEditionZoomDown = new MenuItem("Zoom -0.5");
+		menuEditionZoomDown.setOnAction(editionZoomDownHandler());
+		final MenuItem menuEditionZoomAjuster = new MenuItem("Ajuster à la fenêtre");
+		menuEditionZoomAjuster.setOnAction(editionZoomAjusterHandler());
+		final MenuItem menuEditionZoomReset = new MenuItem("Annuler le zoom");
+		menuEditionZoomReset.setOnAction(editionZoomResetHandler());
+		contextMenu.getItems().addAll(menuEditionZoomUp, menuEditionZoomDown, menuEditionZoomAjuster, menuEditionZoomReset);
+		sp.setOnContextMenuRequested(new EventHandler<ContextMenuEvent>() {
+			@Override
+			public void handle(ContextMenuEvent event) {
+				contextMenu.show(sp, event.getScreenX(), event.getScreenY());
+			}
+		});
 	}
 	
 	/**
@@ -75,21 +102,34 @@ public class MonMenu extends MenuBar {
 		final Menu menuFile = new Menu("Fichier");
 		final MenuItem menuFileOuvrir = new MenuItem("Ouvrir");
 		menuFileOuvrir.setOnAction(fileOuvrirHandler());
+		menuFileOuvrir.setAccelerator(new KeyCharacterCombination("o", KeyCombination.CONTROL_DOWN));
 		menuFile.getItems().add(menuFileOuvrir);
 		
 		final MenuItem menuFileSauvegarder = new MenuItem("Sauvegarder");
 		menuFileSauvegarder.setOnAction(fileSauvHandler());
+		menuFileSauvegarder.setAccelerator(new KeyCharacterCombination("s", KeyCombination.CONTROL_DOWN));
 		menuFile.getItems().add(menuFileSauvegarder);
 		
 		final MenuItem menuFileQuitter = new MenuItem("Quitter");
 		menuFileQuitter.setOnAction(new EventHandler<ActionEvent>() {
 		    @Override public void handle(ActionEvent e) {
-		        System.out.println("Fermeture du programme...");
-		        primaryStage.close();
-		        Platform.exit();
+		        System.out.print("Fermeture du programme...");
+		    	Alert alert = new Alert(AlertType.CONFIRMATION);
+		    	alert.setTitle("Fermer le programme ?");
+		    	alert.setContentText("ëtes-vous sûr de vouloir quitter ?");
+
+		    	Optional<ButtonType> result = alert.showAndWait();
+		    	if (result.get() == ButtonType.OK){
+			        primaryStage.close();
+			        Platform.exit();
+		    	} else {
+			        System.out.println(" Annulée.");
+		    	}
 		    }
 		});
+		menuFileQuitter.setAccelerator(new KeyCharacterCombination("q", KeyCombination.CONTROL_DOWN));
 		menuFile.getItems().add(menuFileQuitter);
+		
 		return menuFile;
 	}
 
@@ -104,9 +144,21 @@ public class MonMenu extends MenuBar {
 	 */
 	private Menu createMenuEdition() {
 		final Menu menuEdition = new Menu("Édition");
-		final MenuItem menuEditionAjuster = new MenuItem("Ajuster à la fenêtre");
-		menuEditionAjuster.setOnAction(editionAjusterHandler());
-		menuEdition.getItems().add(menuEditionAjuster);
+		final Menu menuEditionZoom = new Menu("Zoom");
+		final MenuItem menuEditionZoomUp = new MenuItem("Zoom +0.5");
+		menuEditionZoomUp.setOnAction(editionZoomUpHandler());
+		menuEditionZoomUp.setAccelerator(new KeyCharacterCombination("p", KeyCombination.CONTROL_DOWN));
+		final MenuItem menuEditionZoomDown = new MenuItem("Zoom -0.5");
+		menuEditionZoomDown.setOnAction(editionZoomDownHandler());
+		menuEditionZoomDown.setAccelerator(new KeyCharacterCombination("m", KeyCombination.CONTROL_DOWN));
+		final MenuItem menuEditionZoomAjuster = new MenuItem("Ajuster à la fenêtre");
+		menuEditionZoomAjuster.setOnAction(editionZoomAjusterHandler());
+		menuEditionZoomAjuster.setAccelerator(new KeyCharacterCombination("a", KeyCombination.CONTROL_DOWN));
+		final MenuItem menuEditionZoomReset = new MenuItem("Annuler le zoom");
+		menuEditionZoomReset.setOnAction(editionZoomResetHandler());
+		menuEditionZoomReset.setAccelerator(new KeyCharacterCombination("r", KeyCombination.CONTROL_DOWN));
+		menuEditionZoom.getItems().addAll(menuEditionZoomUp, menuEditionZoomDown, menuEditionZoomAjuster, menuEditionZoomReset);
+		menuEdition.getItems().add(menuEditionZoom);
 		
 		final MenuItem menuEditionNoirBlanc = new MenuItem("Mettre en noir et blanc");
 		menuEditionNoirBlanc.setOnAction(editionNoirBlancHandler());
@@ -208,7 +260,7 @@ public class MonMenu extends MenuBar {
 	 * 
 	 * @return EventHandler<ActionEvent>
 	 */
-	private EventHandler<ActionEvent> editionAjusterHandler() {
+	private EventHandler<ActionEvent> editionZoomAjusterHandler() {
 		return new EventHandler<ActionEvent>() {
 		    @Override public void handle(ActionEvent e) {
 		        System.out.print("Ajustement de l'image à la fenêtre...");
@@ -218,6 +270,51 @@ public class MonMenu extends MenuBar {
 		        double u = (scrollpane.getHeight() - 5) / canvas.getHeight();
                 stackpane.setScaleX(x > u ? u : x);
                 stackpane.setScaleY(x > u ? u : x);
+    			System.out.println(" Terminé.");
+		    }
+		};
+	}
+	/**
+	 * Crée l'écouteur pour l'ajustement de l'image à la fenêtre
+	 * 
+	 * @return EventHandler<ActionEvent>
+	 */
+	private EventHandler<ActionEvent> editionZoomResetHandler() {
+		return new EventHandler<ActionEvent>() {
+		    @Override public void handle(ActionEvent e) {
+		        System.out.print("Reset du zoom...");
+                stackpane.setScaleX(1);
+                stackpane.setScaleY(1);
+    			System.out.println(" Terminé.");
+		    }
+		};
+	}
+	/**
+	 * Crée l'écouteur pour l'ajustement de l'image à la fenêtre
+	 * 
+	 * @return EventHandler<ActionEvent>
+	 */
+	private EventHandler<ActionEvent> editionZoomUpHandler() {
+		return new EventHandler<ActionEvent>() {
+		    @Override public void handle(ActionEvent e) {
+		        System.out.print("Zoom...");
+                stackpane.setScaleX(stackpane.getScaleX() * 1.1);
+                stackpane.setScaleY(stackpane.getScaleY() * 1.1);
+    			System.out.println(" Terminé.");
+		    }
+		};
+	}
+	/**
+	 * Crée l'écouteur pour l'ajustement de l'image à la fenêtre
+	 * 
+	 * @return EventHandler<ActionEvent>
+	 */
+	private EventHandler<ActionEvent> editionZoomDownHandler() {
+		return new EventHandler<ActionEvent>() {
+		    @Override public void handle(ActionEvent e) {
+		        System.out.print("Dézoom...");
+                stackpane.setScaleX(stackpane.getScaleX() * 0.9);
+                stackpane.setScaleY(stackpane.getScaleY() * 0.9);
     			System.out.println(" Terminé.");
 		    }
 		};
