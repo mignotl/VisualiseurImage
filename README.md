@@ -2,7 +2,7 @@
 
 <p>Exercice pour le cours L070 de Licence Pro Web Dev et Big Data 2017, Limoges</p>
 
-<h2>Énnoncé :</h2>
+<h2>Énnoncé</h2>
   <p>Programmer un "visualiseur" d'image.</p>
   
   <ul>
