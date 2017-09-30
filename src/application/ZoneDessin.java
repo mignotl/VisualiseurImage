@@ -7,6 +7,7 @@ import javax.imageio.ImageIO;
 
 import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Rectangle2D;
+import javafx.scene.Cursor;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -27,7 +28,8 @@ import javafx.util.Pair;
  * - le GraphicsContext du canvas
  * - une variable pour sauvegarder la position initiale
  *  de la souris.
- * @author MIGNOT - MATASSE
+ *  
+ * @author mignotl
  *
  */
 public class ZoneDessin extends StackPane {
@@ -43,8 +45,9 @@ public class ZoneDessin extends StackPane {
 	public ZoneDessin(MaPalette toolBar) {
         this.setStyle("-fx-background: #FF0000;");
 		this.toolBar = toolBar;
-		canvas = new Canvas(750, 400);
+		canvas = new Canvas(1920, 1080);
         this.getChildren().add(canvas);
+        this.setCursor(Cursor.CROSSHAIR);
         gc = canvas.getGraphicsContext2D();
         gc.setStroke(toolBar.getColorpickerValue());
         gc.setLineWidth(toolBar.getSliderValue());
@@ -107,24 +110,36 @@ public class ZoneDessin extends StackPane {
 	        	if (toolBar.getSelected() == toolBar.getLineBtn()) {
 	                context.setLineCap(StrokeLineCap.ROUND);
 	                context.strokeLine(initialTouch.getKey(), initialTouch.getValue(), e.getX(), e.getY());
-	        	} else if (toolBar.getSelected() == toolBar.getCircleBtn()) {
-	                context.setFill(toolBar.getColorpickerValue());
-	                context.fillOval(initialTouch.getKey(), initialTouch.getValue(), 
-	                		e.getX() - initialTouch.getKey(), e.getY() - initialTouch.getValue());
-	        	} else if (toolBar.getSelected() == toolBar.getCircleOutlineBtn()) {
-	                context.strokeOval(initialTouch.getKey(), initialTouch.getValue(), 
-	                		e.getX() - initialTouch.getKey(), e.getY() - initialTouch.getValue());
-	        	} else if (toolBar.getSelected() == toolBar.getRectangleBtn()) {
-	                context.setFill(toolBar.getColorpickerValue());
-	                context.fillRect(initialTouch.getKey(), initialTouch.getValue(), 
-	                		e.getX() - initialTouch.getKey(), e.getY() - initialTouch.getValue());
-	        	} else if (toolBar.getSelected() == toolBar.getRectangleOutlineBtn()) {
-	                context.strokeRect(initialTouch.getKey(), initialTouch.getValue(), 
-	                		e.getX() - initialTouch.getKey(), e.getY() - initialTouch.getValue());
-	        	} else if (toolBar.getSelected() == toolBar.getRognerBtn()) {
-	        		context.setFill(Color.rgb(0, 0, 0, 0.5));
-	                context.fillRect(initialTouch.getKey(), initialTouch.getValue(), 
-	                		e.getX() - initialTouch.getKey(), e.getY() - initialTouch.getValue());
+	        	} else {
+	        		double x, y, w, h;
+	        		if (e.getX() > initialTouch.getKey()) {
+	        			x = initialTouch.getKey();
+	        			w = e.getX() - initialTouch.getKey();
+	        		} else {
+	        			x = e.getX();
+	        			w = initialTouch.getKey() - e.getX();
+	        		}
+	        		if (e.getY() > initialTouch.getValue()) {
+	        		    y = initialTouch.getValue();
+	        			h = e.getY() - initialTouch.getValue();
+	        		} else {
+	        		    y = e.getY();
+	        			h = initialTouch.getValue() - e.getY();
+	        		}
+	        		if (toolBar.getSelected() == toolBar.getCircleBtn()) {
+		                context.setFill(toolBar.getColorpickerValue());
+		                context.fillOval(x, y, w, h);
+		        	} else if (toolBar.getSelected() == toolBar.getCircleOutlineBtn()) {
+		                context.strokeOval(x, y, w, h);
+		        	} else if (toolBar.getSelected() == toolBar.getRectangleBtn()) {
+		                context.setFill(toolBar.getColorpickerValue());
+		                context.fillRect(x, y, w, h);
+		        	} else if (toolBar.getSelected() == toolBar.getRectangleOutlineBtn()) {
+		                context.strokeRect(x, y, w, h);
+		        	} else if (toolBar.getSelected() == toolBar.getRognerBtn()) {
+		        		context.setFill(Color.rgb(0, 0, 0, 0.5));
+		                context.fillRect(x, y, w, h);
+		        	}
 	        	}
 	    	}
 		});
@@ -150,48 +165,60 @@ public class ZoneDessin extends StackPane {
 	        	if (toolBar.getSelected() == toolBar.getLineBtn()) {
 	                gc.setLineCap(StrokeLineCap.ROUND);
 	                gc.strokeLine(initialTouch.getKey(), initialTouch.getValue(), e.getX(), e.getY());
-	        	} else if (toolBar.getSelected() == toolBar.getCircleBtn()) {
-	                gc.setFill(toolBar.getColorpickerValue());
-	                gc.fillOval(initialTouch.getKey(), initialTouch.getValue(), 
-	                		e.getX() - initialTouch.getKey(), e.getY() - initialTouch.getValue());
-	        	} else if (toolBar.getSelected() == toolBar.getCircleOutlineBtn()) {
-	                gc.strokeOval(initialTouch.getKey(), initialTouch.getValue(), 
-	                		e.getX() - initialTouch.getKey(), e.getY() - initialTouch.getValue());
-	        	} else if (toolBar.getSelected() == toolBar.getRectangleBtn()) {
-	                gc.setFill(toolBar.getColorpickerValue());
-	                gc.fillRect(initialTouch.getKey(), initialTouch.getValue(), 
-	                		e.getX() - initialTouch.getKey(), e.getY() - initialTouch.getValue());
-	        	} else if (toolBar.getSelected() == toolBar.getRectangleOutlineBtn()) {
-	                gc.strokeRect(initialTouch.getKey(), initialTouch.getValue(), 
-	                		e.getX() - initialTouch.getKey(), e.getY() - initialTouch.getValue());
-	        	} else if (toolBar.getSelected() == toolBar.getRognerBtn()) {
-	        		SnapshotParameters parameters = new SnapshotParameters();
-	        		parameters.setViewport(new Rectangle2D(initialTouch.getKey(), initialTouch.getValue(), 
-	                		e.getX() - initialTouch.getKey(), e.getY() - initialTouch.getValue()));
-	                WritableImage snapshot = canvas.snapshot(parameters, null);
-
-	                FileChooser fileChooser = new FileChooser();
-	                fileChooser.setTitle("Sauvegarder");
-	                
-		            //Set extension filter
-		            FileChooser.ExtensionFilter extFilterJPG = new FileChooser.ExtensionFilter("JPG files (*.jpg)", "*.JPG");
-		            FileChooser.ExtensionFilter extFilterJPEG = new FileChooser.ExtensionFilter("JPEG files (*.jpeg)", "*.JPEG");
-		            FileChooser.ExtensionFilter extFilterPNG = new FileChooser.ExtensionFilter("PNG files (*.png)", "*.PNG");
-		            fileChooser.getExtensionFilters().addAll(extFilterJPG, extFilterJPEG, extFilterPNG);
-
-		            //Show open file dialog
-	                File outputFile = fileChooser.showSaveDialog(canvas.getScene().getWindow());
-		            if (outputFile == null) {
-		            	System.out.println(" Annulée.");
-		            	return;
-		            }
-
-	                try {
-						ImageIO.write(SwingFXUtils.fromFXImage(snapshot, null), "png", outputFile);
-					} catch (IOException e1) {
-		            	System.out.println(" Annulée.");
-		            	return;
-					}
+	        	} else {
+	        		double x, y, w, h;
+	        		if (e.getX() > initialTouch.getKey()) {
+	        			x = initialTouch.getKey();
+	        			w = e.getX() - initialTouch.getKey();
+	        		} else {
+	        			x = e.getX();
+	        			w = initialTouch.getKey() - e.getX();
+	        		}
+	        		if (e.getY() > initialTouch.getValue()) {
+	        		    y = initialTouch.getValue();
+	        			h = e.getY() - initialTouch.getValue();
+	        		} else {
+	        		    y = e.getY();
+	        			h = initialTouch.getValue() - e.getY();
+	        		}
+	        		if (toolBar.getSelected() == toolBar.getCircleBtn()) {
+		                gc.setFill(toolBar.getColorpickerValue());
+		                gc.fillOval(x, y, w, h);
+		        	} else if (toolBar.getSelected() == toolBar.getCircleOutlineBtn()) {
+		                gc.strokeOval(x, y, w, h);
+		        	} else if (toolBar.getSelected() == toolBar.getRectangleBtn()) {
+		                gc.setFill(toolBar.getColorpickerValue());
+		                gc.fillRect(x, y, w, h);
+		        	} else if (toolBar.getSelected() == toolBar.getRectangleOutlineBtn()) {
+		                gc.strokeRect(x, y, w, h);
+		        	} else if (toolBar.getSelected() == toolBar.getRognerBtn()) {
+		        		SnapshotParameters parameters = new SnapshotParameters();
+		        		parameters.setViewport(new Rectangle2D(x, y, w, h));
+		                WritableImage snapshot = canvas.snapshot(parameters, null);
+	
+		                FileChooser fileChooser = new FileChooser();
+		                fileChooser.setTitle("Sauvegarder");
+		                
+			            //Set extension filter
+			            FileChooser.ExtensionFilter extFilterJPG = new FileChooser.ExtensionFilter("JPG files (*.jpg)", "*.JPG");
+			            FileChooser.ExtensionFilter extFilterJPEG = new FileChooser.ExtensionFilter("JPEG files (*.jpeg)", "*.JPEG");
+			            FileChooser.ExtensionFilter extFilterPNG = new FileChooser.ExtensionFilter("PNG files (*.png)", "*.PNG");
+			            fileChooser.getExtensionFilters().addAll(extFilterJPG, extFilterJPEG, extFilterPNG);
+	
+			            //Show open file dialog
+		                File outputFile = fileChooser.showSaveDialog(canvas.getScene().getWindow());
+			            if (outputFile == null) {
+			            	System.out.println(" Annulée.");
+			            	return;
+			            }
+	
+		                try {
+							ImageIO.write(SwingFXUtils.fromFXImage(snapshot, null), "png", outputFile);
+						} catch (IOException e1) {
+			            	System.out.println(" Annulée.");
+			            	return;
+						}
+		        	}
 	        	}
         	}
         });

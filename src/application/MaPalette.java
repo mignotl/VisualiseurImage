@@ -1,5 +1,6 @@
 package application;
 
+import javafx.scene.Cursor;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
@@ -20,7 +21,7 @@ import javafx.scene.paint.Color;
  * Ces objets permettent de savoir quelle action
  *  sera effectuée sur le canvas de ZoneDessin
  * 
- * @author MIGNOT - MATASSE
+ * @author mignotl
  *
  */
 public class MaPalette extends ToolBar {
@@ -85,6 +86,7 @@ public class MaPalette extends ToolBar {
 		btn.getStyleClass().remove("radio-button");
 		btn.getStyleClass().add("toggle-button");
 		btn.setTooltip(new Tooltip(tooltip));
+		btn.setCursor(Cursor.HAND);
 		btn.setToggleGroup(group);
 		return btn;
 	}
@@ -99,10 +101,6 @@ public class MaPalette extends ToolBar {
 
 	public RadioButton getPenBtn() {
 		return penBtn;
-	}
-
-	public ToggleGroup getGroup() {
-		return group;
 	}
 
 	public RadioButton getLineBtn() {

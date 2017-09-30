@@ -43,7 +43,7 @@ import javafx.stage.Stage;
  *  classe ZoneDessin pour pouvoir créer les méthodes
  *  gérant les actions.
  *  
- * @author MIGNOT - MATASSE
+ * @author mignotl
  *
  */
 public class MonMenu extends MenuBar {
@@ -64,7 +64,7 @@ public class MonMenu extends MenuBar {
 	}
 	
 	/**
-	 * Créé le menu Fichier et le renvoie
+	 * Crée le menu Fichier et le renvoie
 	 * 
 	 * Le menu renvoyé possède trois menuItem :
 	 *  Ouvrir, Sauvegarder et Quitter
@@ -95,7 +95,7 @@ public class MonMenu extends MenuBar {
 
 	
 	/**
-	 * Créé le menu Edition et le renvoie
+	 * Crée le menu Edition et le renvoie
 	 * 
 	 * Le menu renvoyé possède trois menuItem :
 	 *  Ajuster, Noir et blanc et Annuler
@@ -124,7 +124,7 @@ public class MonMenu extends MenuBar {
 	}
 
 	/**
-	 * Créé l'écouteur pour l'ouverture d'un fichier
+	 * Crée l'écouteur pour l'ouverture d'un fichier
 	 * 
 	 * @return EventHandler<ActionEvent>
 	 */
@@ -166,7 +166,7 @@ public class MonMenu extends MenuBar {
 	}
 
 	/**
-	 * Créé l'écouteur pour la sauvegarde du dessin
+	 * Crée l'écouteur pour la sauvegarde du dessin
 	 * 
 	 * @return EventHandler<ActionEvent>
 	 */
@@ -204,7 +204,7 @@ public class MonMenu extends MenuBar {
 	}
 
 	/**
-	 * Créé l'écouteur pour l'ajustement de l'image à la fenêtre
+	 * Crée l'écouteur pour l'ajustement de l'image à la fenêtre
 	 * 
 	 * @return EventHandler<ActionEvent>
 	 */
@@ -224,7 +224,7 @@ public class MonMenu extends MenuBar {
 	}
 
 	/**
-	 * Créé l'écouteur pour la transformation de l'image en norie et blanc
+	 * Crée l'écouteur pour la transformation de l'image en norie et blanc
 	 * 
 	 * @return EventHandler<ActionEvent>
 	 */
